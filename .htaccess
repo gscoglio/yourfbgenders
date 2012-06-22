@@ -1,0 +1,17 @@
+AddDefaultCharset UTF-8
+Options +FollowSymLinks
+RewriteEngine On
+RewriteBase /
+ 
+# COMPRESIÓN GZIP
+<IfModule mod_deflate.c>
+<FilesMatch "\.(css|js|x?html?|php)$">
+SetOutputFilter DEFLATE
+</FilesMatch>
+</IfModule> 
+  
+RewriteCond %{SCRIPT_FILENAME} !-d  
+RewriteCond %{SCRIPT_FILENAME} !-f    
+#RewriteRule ^([0-9]+)$ /stats.php?user_id=$1 [L]
+#RewriteRule ^sitemap/page/(.+)$ /sitemap.php?page=$1 [L]
+RewriteRule ^(.+)$ /stats.php?param=$1 [L]
