@@ -1,0 +1,7 @@
+Archivos a cambiar:
+
+config.php :: url
+db.php :: conexión a base de datos
+
+En los hosts para trabajar local:
+127.0.0.1	yourfbgenders.com
