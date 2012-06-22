@@ -8,7 +8,9 @@ include_once 'config.php';
 include_once 'db.php';
 
 function print_home($dialog_url) {
-global $my_url;
+
+    global $my_url;
+    $db = new DataBase();
 ?>
     <head>
         <title>Facebook Friend Genders</title>
@@ -42,7 +44,7 @@ global $my_url;
         </div>
         <div id="home_message">
             <p>Results will be published in your wall</p>
-            <?php $users_amount = amountOfUsers();?>
+            <?php $users_amount = $db->amountOfUsers();?>
             <p><?php echo($users_amount[0]);?> users have already tried this app!</p>
         </div>
 </div>

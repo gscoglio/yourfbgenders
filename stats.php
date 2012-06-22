@@ -10,6 +10,7 @@ include_once 'config.php';
 $username = $_GET['username'];
 $user_id = $_GET['user_id'];
 $param = $_GET['param'];
+$db = new DataBase();
 
 $params_array = explode("/", $param);
 if (sizeof($params_array) == 2 && is_numeric($params_array[1])) {
@@ -21,10 +22,10 @@ if (sizeof($params_array) == 2 && is_numeric($params_array[1])) {
     die();
 }
 
-if ($username != null && usernameExists($username)) {
-    $user = fetchUserByUserName($username);
-} elseif ($user_id != null && userExists($user_id)) {
-    $user = fetchUserById($user_id);
+if ($username != null && $db->usernameExists($username)) {
+    $user = $db->fetchUserByUserName($username);
+} elseif ($user_id != null && $db->userExists($user_id)) {
+    $user = $db->fetchUserById($user_id);
 } else {
     include_once 'index.php';
     die();

@@ -6,7 +6,7 @@
 
 $app_id = "226435084034030";
 $app_secret = "cb4f15c23f5e3eb41707d6bb7c1302e9";
-$my_url = "http://www.yourfbgenders.com/";
+$my_url = "http://www.yourfbgenders.com/yourfbgenders/";
 
 /*DATA BASE*/
 // SET UP DIRECTLY IN db.php SINCE GLOBALS ARE NOT ALLOWED

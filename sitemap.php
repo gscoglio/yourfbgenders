@@ -9,11 +9,15 @@ include_once 'db.php';
 $page_size = 25;
 $page = $_GET['page'];
 
+$db = new DataBase();
+
 if ($page == null || !is_numeric($page)) {
     $page = 1;
 }
 
-$users = fetchUsers($page, $page_size);
+$users = $db->fetchUsers($page, $page_size);
+$db = new DataBase();
+
 ?>
 <head>
         <title>Sitemap - Your Facebook Friend Genders</title>
@@ -78,7 +82,7 @@ if($page > 1){
 ?>
 
 <?php
-$amount_of_users = amountOfUsers();
+$amount_of_users = $db->amountOfUsers();
 if($page * $page_size < $amount_of_users[0]){
     ?>
 <div style="float:right">

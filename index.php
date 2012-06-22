@@ -12,9 +12,8 @@ include_once 'db.php';
 include_once 'post.php';
 
 session_start();
-$code = $_REQUEST["code"];
 
-if (empty($code)) {
+if (empty($_REQUEST["code"])) {
     $_SESSION['state'] = md5(uniqid(rand(), TRUE)); //CSRF protection
     $dialog_url = "https://www.facebook.com/dialog/oauth?client_id="
             . $app_id . "&redirect_uri=" . urlencode($my_url)
@@ -24,6 +23,7 @@ if (empty($code)) {
     // Imprimo la home:
     print_home($dialog_url);
 } else {
+    $code = $_REQUEST["code"];
     //if ($_REQUEST['state'] == $_SESSION['state']) {
     $token_url = "https://graph.facebook.com/oauth/access_token?"
             . "client_id=" . $app_id . "&redirect_uri=" . urlencode($my_url)
@@ -66,44 +66,55 @@ if (empty($code)) {
     $female_count = 0;
 
     foreach ($user_friends->data as $friend) {
-        $gender = $friend->gender;
+        if (isset($friend->gender)) {
+            $gender = $friend->gender;
 
-        switch ($gender) {
-            case "male":
-                $male_count++;
-                break;
-            case "female":
-                $female_count++;
-                break;
+            switch ($gender) {
+                case "male":
+                    $male_count++;
+                    break;
+                case "female":
+                    $female_count++;
+                    break;
+            }
         }
     }
 
     $unknown_friends_amount = $total_friends - $female_count - $male_count;
     $total_friends_without_unknown = $female_count + $male_count;
-    $female_perc = number_format(($female_count / $total_friends_without_unknown) * 100, 2);
-    $male_perc = number_format(($male_count / $total_friends_without_unknown) * 100, 2);
-    $unknown_perc = number_format(($unknown_friends_amount / $total_friends) * 100, 2);
+    $female_perc = number_format(
+        ($female_count / $total_friends_without_unknown) * 100, 2
+    );
+    $male_perc =
+        number_format(($male_count / $total_friends_without_unknown) * 100, 2);
+    $unknown_perc =
+        number_format(($unknown_friends_amount / $total_friends) * 100, 2);
 
-    if (userExists($user_id)) {
-        updateUser($user_id, $name, $first_name, $last_name, $link,
-                $username, $my_gender, $locale, $male_count, $female_count,
-                $unknown_friends_amount, $total_friends, $female_perc,
-                $male_perc, $unknown_perc, $params['access_token'], 0);
-    } else {
-        InsertNewUser($user_id, $name, $first_name, $last_name, $link,
-                $username, $my_gender, $locale, $male_count, $female_count,
-                $unknown_friends_amount, $total_friends, $female_perc,
-                $male_perc, $unknown_perc, $params['access_token'], 0);
-    }
+    $bind = array(
+        'user_id'                => $user_id,
+        'name'                   => $name,
+        'first_name'             => $first_name,
+        'last_name'              => $last_name,
+        'link'                   => $link,
+        'username'               => $username,
+        'gender'                 => $my_gender,
+        'locale'                 => $locale,
+        'male_count'             => $male_count,
+        'female_count'           => $female_count,
+        'unknown_friends_amount' => $unknown_friends_amount,
+        'total_friends'          => $total_friends,
+        'female_perc'            => $female_perc,
+        'male_perc'              => $male_perc,
+        'unknown_perc'           => $unknown_perc,
+        'access_token'           => $params['access_token'],
+        'published'              => 0,
+    );
 
-    post_to_wall($user_id, $username, $first_name, $last_name, $male_count,
-            $male_perc, $female_count, $female_perc, $params['access_token']);
+    $db = new DataBase();
+    $db->saveUser($bind);
 
-    print_results($user_id, $first_name, $last_name, $username, $male_count,
-            $female_count, $unknown_friends_amount, $total_friends,
-            $female_perc, $male_perc, $unknown_perc);
-//    } else {
-//        echo("The state does not match. You may be a victim of CSRF.");
-//    }
+    postToWall($bind);
+
+    printResults($bind);
 }
 ?>

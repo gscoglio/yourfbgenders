@@ -6,8 +6,9 @@
 
 include_once 'config.php';
 
-function print_results($user_id, $first_name, $last_name, $username, $male_count, $female_count, $unknown_friends_amount, $total_friends, $female_perc, $male_perc, $unknown_perc) {
-global $my_url;
+function printResults($params) {
+
+    global $my_url;
 ?>
     <head>
         <title>Your Facebook Friend Genders</title>

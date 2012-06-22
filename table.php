@@ -25,7 +25,7 @@
         <tfoot>
             <tr>
                 <td>Total amount of friends</td>
-                <td colspan=2><?php echo($total_friends); ?></td>
+                <td colspan=2><?php echo($params['total_friends']); ?></td>
             </tr>
         </tfoot>
 
@@ -34,18 +34,18 @@
         <tbody>
             <tr>
                 <td>Female friends</td>
-                <td><?php echo($female_count); ?></td>
-                <td><?php echo($female_perc . ' %'); ?></td>
+                <td><?php echo($params['female_count']); ?></td>
+                <td><?php echo($params['female_perc'] . ' %'); ?></td>
             </tr>
             <tr>
                 <td>Male friends</td>
-                <td><?php echo($male_count); ?></td>
-                <td><?php echo($male_perc . ' %'); ?></td>
+                <td><?php echo($params['male_count']); ?></td>
+                <td><?php echo($params['male_perc'] . ' %'); ?></td>
             </tr>
             <tr>
                 <td>Unknown gender friends</td>
-                <td colspan=2><?php echo($unknown_friends_amount); ?></td>
-<!--                <td><?php echo($unknown_perc . ' %'); ?></td>-->
+                <td colspan=2><?php echo($params['unknown_friends_amount']); ?></td>
+<!--                <td><?php echo($params['unknown_perc'] . ' %'); ?></td>-->
             </tr>
         </tbody>
 

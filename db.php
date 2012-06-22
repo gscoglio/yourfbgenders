@@ -7,188 +7,162 @@
 
 include_once 'config.php';
 
-function Conectarse() {
+class DataBase
+{
+    private $_db;
 
-    //global $database;
-
-    //$db_name = $GLOBALS['database']['db_name'];
-    //$db_username = $GLOBALS['database']['db_username'];
-    //$db_password = $GLOBALS['database']['$db_password'];
-
-    if (!($link = mysql_connect("mysql.yourfbgenders.com", "yourfbgenders", "urfbgenders"))) {
-        echo "Error conecting to data base";
-        exit();
+    public function __construct() {
+        if (!($link = mysql_connect("localhost", "root", "root"))) {
+            echo "Error conecting to data base";
+            exit();
+        }
+        if (!mysql_select_db("yourfbgenders", $link)) {
+            echo "Error selecting data base";
+            exit();
+        }
+        $this->_db = $link;
     }
-    if (!mysql_select_db("yourfbgenders", $link)) {
-        echo "Error selecting data base";
-        exit();
+
+    public function saveUser($bind) {
+        if ($this->userExists($bind['user_id'])) {
+            $this->_updateUser($bind);
+        } else {
+            $this->_insertNewUser($bind);
+        }
     }
-    return $link;
-}
 
-function InsertNewUser($user_id, $name, $first_name, $last_name, $link, $username, $gender, $locale, $male_count, $female_count, $unknown_friends_amount, $total_friends, $female_perc, $male_perc, $unknown_perc, $access_token, $published) {
+    private function _insertNewUser($params) {
 
-    $conection = Conectarse();
-
-    $sql = "INSERT INTO user_data (user_id, name, first_name, last_name, link,
+        $sql = "INSERT INTO user_data (user_id, name, first_name, last_name, link,
     username, gender, locale, male_count, female_count, unknown_friends_amount,
     total_friends, female_perc, male_perc, unknown_perc, access_token, published) values(" .
-            $user_id . "," .
-            "'" . addslashes($name) . "'," .
-            "'" . addslashes($first_name) . "'," .
-            "'" . addslashes($last_name) . "'," .
-            "'" . $link . "'," .
-            "'" . $username . "'," .
-            "'" . $gender . "'," .
-            "'" . $locale . "'," .
-            $male_count . "," .
-            $female_count . "," .
-            $unknown_friends_amount . "," .
-            $total_friends . "," .
-            $female_perc . "," .
-            $male_perc . "," .
-            $unknown_perc . "," .
-            "'" . $access_token . "'," .
-            $published .
-            ");";
+                $params['user_id'] . "," .
+                "'" . addslashes($params['name']) . "'," .
+                "'" . addslashes($params['first_name']) . "'," .
+                "'" . addslashes($params['last_name']) . "'," .
+                "'" . $params['link'] . "'," .
+                "'" . $params['username'] . "'," .
+                "'" . $params['gender'] . "'," .
+                "'" . $params['locale'] . "'," .
+                $params['male_count'] . "," .
+                $params['female_count'] . "," .
+                $params['unknown_friends_amount'] . "," .
+                $params['total_friends'] . "," .
+                $params['female_perc'] . "," .
+                $params['male_perc'] . "," .
+                $params['unknown_perc'] . "," .
+                "'" . $params['access_token'] . "'," .
+                $params['published'] .
+                ");";
 
-    $query = mysql_query($sql, $conection)
-            or die("Error inserting data in data base");
-
-    mysql_close($conection); //cierra la conexion
-}
-
-function SaveLastUser($user_id) {
-    $conection = Conectarse();
-    $sql = "UPDATE last_user SET user_id=$user_id;";
-    $query = mysql_query($sql, $conection)
-            or die("Error inserting data in data base");
-    mysql_close($conection); //cierra la conexion
-}
-
-
-function updateUser($user_id, $name, $first_name, $last_name, $link, $username, $gender, $locale, $male_count, $female_count, $unknown_friends_amount, $total_friends, $female_perc, $male_perc, $unknown_perc, $access_token, $published) {
-
-    $conection = Conectarse();
-
-    $sql = "UPDATE user_data SET name = '". addslashes($name) . "', first_name = '" . addslashes($first_name) . "',
-     last_name = '" . addslashes($last_name) . "', link = '$link', username = '$username',
-     gender = '$gender', locale = '$locale', male_count = $male_count,
-     female_count = $female_count, unknown_friends_amount = $unknown_friends_amount,
-     total_friends = $total_friends, female_perc = $female_perc,
-     male_perc = $male_perc, unknown_perc = $unknown_perc, access_token = '$access_token', published = $published
-     WHERE user_id = $user_id;";
-
-    $query = mysql_query($sql, $conection)
-            or die("Error updating user data");
-
-    mysql_close($conection); //cierra la conexion
-}
-
-function fetchUserById($user_id) {
-
-    $conection = Conectarse();
-
-    $user_id_escaped = mysql_real_escape_string($user_id);
-    $sql = "SELECT * FROM user_data WHERE user_id = " . $user_id_escaped . " LIMIT 1;";
-
-    $query = mysql_query($sql, $conection);
-    $result = mysql_fetch_array($query);
-    mysql_close($conection); //cierra la conexion
-
-    return $result;
-}
-
-function fetchLastUser() {
-
-    $conection = Conectarse();
-
-    $sql = "SELECT * FROM last_user;";
-
-    $query = mysql_query($sql, $conection);
-    $result = mysql_fetch_array($query);
-    mysql_close($conection); //cierra la conexion
-
-    return $result;
-}
-
-function amountOfUsers() {
-
-    $conection = Conectarse();
-
-    $sql = "SELECT count(*) FROM user_data;";
-
-    $query = mysql_query($sql, $conection);
-    $result = mysql_fetch_array($query);
-    mysql_close($conection); //cierra la conexion
-
-    return $result;
-}
-
-function fetchUserByUserName($username) {
-
-    $conection = Conectarse();
-
-    $username_escaped = mysql_real_escape_string($username);
-    $sql = "SELECT * FROM user_data WHERE username = '" . $username_escaped . "' ORDER BY id DESC LIMIT 1;";
-
-    $query = mysql_query($sql, $conection);
-    $result = mysql_fetch_array($query);
-
-    mysql_close($conection); //cierra la conexion
-
-    return $result;
-}
-
-function userExists($user_id) {
-
-    $conection = Conectarse();
-
-    $user_id_escaped = mysql_real_escape_string($user_id);
-    $sql = "SELECT count(*) AS amount FROM user_data WHERE user_id = " . $user_id_escaped . ";";
-
-    $query = mysql_query($sql, $conection);
-    $result = mysql_fetch_array($query);
-    mysql_close($conection); //cierra la conexion
-
-    if ($result['amount'] > 0) {
-        return true;
+        $query = mysql_query($sql, $this->_db)
+                or die("Error inserting data in data base");
     }
 
-    return false;
-}
-
-function usernameExists($username) {
-
-    $conection = Conectarse();
-
-    $username_escaped = mysql_real_escape_string($username);
-    $sql = "SELECT count(*) AS amount FROM user_data WHERE username = '" . $username_escaped . "';";
-
-    $query = mysql_query($sql, $conection);
-    $result = mysql_fetch_array($query);
-    mysql_close($conection); //cierra la conexion
-
-    if ($result['amount'] > 0) {
-        return true;
+    public function saveLastUser($user_id) {
+        $sql = "UPDATE last_user SET user_id=$user_id;";
+        $query = mysql_query($sql, $this->_db)
+                or die("Error inserting data in data base");
     }
 
-    return false;
-}
+    private function _updateUser($params) {
 
-function fetchUsers($page, $amount){
+        $sql = "UPDATE user_data SET
+        name = '" . addslashes($params['name']) . "',
+        first_name = '" . addslashes($params['first_name']) . "',
+        last_name = '" . addslashes($params['last_name']) . "',
+        link = '{$params['link']}',
+        username = '{$params['username']}',
+        gender = '{$params['gender']}',
+        locale = '{$params['locale']}',
+        male_count = {$params['male_count']},
+        female_count = {$params['female_count']},
+        unknown_friends_amount = {$params['unknown_friends_amount']},
+        total_friends = {$params['total_friends']},
+        female_perc = {$params['female_perc']},
+        male_perc = {$params['male_perc']},
+        unknown_perc = {$params['unknown_perc']},
+        access_token = '{$params['access_token']}',
+        published = {$params['published']}
+        WHERE user_id = {$params['user_id']};";
 
-    $conection = Conectarse();
-    
-    $sql = "SELECT * FROM user_data LIMIT " . ($page - 1) * $amount . "," . $amount . ";";
-    $query = mysql_query($sql, $conection);
-    while($result = mysql_fetch_array($query)){
-        $users[] = $result;
+        $query = mysql_query($sql, $this->_db)
+                or die("Error updating user data");
     }
 
-    mysql_close($conection); //cierra la conexion
+    public function fetchUserById($user_id) {
+        $user_id_escaped = mysql_real_escape_string($user_id);
+        $sql = "SELECT * FROM user_data WHERE user_id = " 
+            . $user_id_escaped . " LIMIT 1;"
+        ;
+        $query = mysql_query($sql, $this->_db);
+        $result = mysql_fetch_array($query);
+        return $result;
+    }
 
-    return $users;
+    public function fetchLastUser() {
+        $sql = "SELECT * FROM last_user;";
+        $query = mysql_query($sql, $this->_db);
+        $result = mysql_fetch_array($query);
+        return $result;
+    }
+
+    public function amountOfUsers() {
+        $sql = "SELECT count(*) FROM user_data;";
+        $query = mysql_query($sql, $this->_db);
+        $result = mysql_fetch_array($query);
+        return $result;
+    }
+
+    public function fetchUserByUserName($username) {
+        $username_escaped = mysql_real_escape_string($username);
+        $sql = "SELECT * FROM user_data WHERE username = '" 
+            . $username_escaped . "' ORDER BY id DESC LIMIT 1;"
+        ;
+        $query = mysql_query($sql, $this->_db);
+        $result = mysql_fetch_array($query);
+        return $result;
+    }
+
+    public function userExists($user_id) {
+        $user_id_escaped = mysql_real_escape_string($user_id);
+        $sql = "SELECT count(*) AS amount FROM user_data WHERE user_id = " 
+            . $user_id_escaped . ";"
+        ;
+        $query = mysql_query($sql, $this->_db);
+        $result = mysql_fetch_array($query);
+
+        if ($result['amount'] > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function usernameExists($username) {
+        $username_escaped = mysql_real_escape_string($username);
+        $sql = "SELECT count(*) AS amount FROM user_data WHERE username = '" 
+            . $username_escaped . "';"
+        ;
+        $query = mysql_query($sql, $this->_db);
+        $result = mysql_fetch_array($query);
+
+        if ($result['amount'] > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function fetchUsers($page, $amount) {
+        $sql = "SELECT * FROM user_data LIMIT " . ($page - 1) * $amount 
+            . "," . $amount . ";"
+        ;
+        $query = mysql_query($sql, $this->_db);
+        while ($result = mysql_fetch_array($query)) {
+            $users[] = $result;
+        }
+        return $users;
+    }
+
 }
-
-?>

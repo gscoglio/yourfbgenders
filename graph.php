@@ -25,11 +25,11 @@
         data.addColumn('number', 'Amount');
         data.addRows(3);
         data.setValue(0, 0, 'Female friends');
-        data.setValue(0, 1, <?php echo($female_count); ?>);
+        data.setValue(0, 1, <?php echo($params['female_count']); ?>);
         data.setValue(1, 0, 'Male friends');
-        data.setValue(1, 1, <?php echo($male_count); ?>);
+        data.setValue(1, 1, <?php echo($params['male_count']); ?>);
 //        data.setValue(2, 0, 'Unknown gender friends');
-//        data.setValue(2, 1, <?php echo($unknown_friends_amount); ?>);
+//        data.setValue(2, 1, <?php echo($params['unknown_friends_amount']); ?>);
 
 
         // Set chart options
@@ -44,5 +44,3 @@
         chart.draw(data, options);
     }
 </script>
-
-
